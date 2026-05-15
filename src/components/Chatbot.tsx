@@ -17,6 +17,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ onRecommend }) => {
   ]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [location, setLocation] = useState('');
   const [weather, setWeather] = useState('');
   const [people, setPeople] = useState('');
   const [budget, setBudget] = useState('');
@@ -26,6 +27,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ onRecommend }) => {
 
   const handleRecommend = async () => {
     const userContext = `상황:
+지역: ${location || '상관없음'}
 날씨: ${weather || '상관없음'}
 인원수: ${people || '상관없음'}
 예산: ${budget || '상관없음'}
@@ -51,11 +53,11 @@ const Chatbot: React.FC<ChatbotProps> = ({ onRecommend }) => {
         const menuNames = matches.map(m => m[1].trim());
         onRecommend(menuNames);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: '죄송합니다. 오류가 발생하여 추천을 가져오지 못했습니다.' },
+        { role: 'assistant', content: `죄송합니다. 오류가 발생하여 추천을 가져오지 못했습니다. (${error.message || '알 수 없는 오류'})` },
       ]);
     } finally {
       setIsLoading(false);
@@ -65,6 +67,10 @@ const Chatbot: React.FC<ChatbotProps> = ({ onRecommend }) => {
   return (
     <div className="glass-panel">
       <h2>🤖 AI 상황별 추천</h2>
+      <div className="input-group">
+        <label>지역</label>
+        <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="예: 강남역, 홍대, 우리 회사 근처" />
+      </div>
       <div className="input-group">
         <label>날씨</label>
         <input type="text" value={weather} onChange={(e) => setWeather(e.target.value)} placeholder="예: 비, 맑음, 흐림" />

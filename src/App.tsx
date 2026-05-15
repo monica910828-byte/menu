@@ -37,10 +37,25 @@ function App() {
       <div className="app-container">
         
         {/* Left Panel: AI Chatbot */}
-        <Chatbot onRecommend={handleAIRecommend} />
+        <div style={{ position: 'relative' }}>
+          <img 
+            src="/cute_fish.png" 
+            alt="cute fish" 
+            style={{ 
+              position: 'absolute', 
+              top: '-40px', 
+              left: '-30px', 
+              width: '80px', 
+              transform: 'rotate(-15deg)',
+              zIndex: 10,
+              filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.1))'
+            }} 
+          />
+          <Chatbot onRecommend={handleAIRecommend} />
+        </div>
 
         {/* Right Panel: Roulette */}
-        <div className="glass-panel">
+        <div className="glass-panel" style={{ position: 'relative' }}>
           <h2>🎯 점심 메뉴 룰렛</h2>
           
           <div className="menu-tags">
