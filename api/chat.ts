@@ -1,23 +1,14 @@
-export const config = {
-  runtime: 'edge',
-};
-
-declare const process: any;
-
-export default async function handler(req: Request) {
+export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { messages } = await req.json();
+    const messages = req.body.messages;
     const apiKey = process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
-      throw new Error("OpenAI API key not configured");
+      return res.status(500).json({ error: 'OpenAI API key not configured' });
     }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -35,21 +26,12 @@ export default async function handler(req: Request) {
     const data = await response.json();
 
     if (!response.ok) {
-      return new Response(JSON.stringify({ error: data.error?.message || 'OpenAI API Error' }), {
-        status: response.status,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return res.status(response.status).json({ error: data.error?.message || 'OpenAI API Error' });
     }
 
-    return new Response(JSON.stringify(data), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return res.status(200).json(data);
   } catch (error: any) {
     console.error('Error in chat API:', error);
-    return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return res.status(500).json({ error: error.message || 'Internal Server Error' });
   }
 }
