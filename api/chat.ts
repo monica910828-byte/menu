@@ -17,10 +17,7 @@ export default async function handler(req: Request) {
     const apiKey = process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: 'OpenAI API key not configured' }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      throw new Error("OpenAI API key not configured");
     }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
