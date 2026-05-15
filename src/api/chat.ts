@@ -9,7 +9,14 @@ export const fetchChatResponse = async (messages: { role: string; content: strin
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch from /api/chat');
+      let errorMessage = 'Failed to fetch from /api/chat';
+      try {
+        const errData = await response.json();
+        if (errData.error) errorMessage = errData.error;
+      } catch (e) {
+        // ignore JSON parse error
+      }
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();

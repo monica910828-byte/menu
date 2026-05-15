@@ -36,13 +36,21 @@ export default async function handler(req: Request) {
     });
 
     const data = await response.json();
+
+    if (!response.ok) {
+      return new Response(JSON.stringify({ error: data.error?.message || 'OpenAI API Error' }), {
+        status: response.status,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     return new Response(JSON.stringify(data), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in chat API:', error);
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+    return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
