@@ -4,9 +4,13 @@ import Roulette from './components/Roulette';
 import './index.css';
 
 function App() {
-  const [rouletteItems, setRouletteItems] = useState<string[]>(['짜장면', '김치찌개', '돈까스', '제육볶음', '국밥']);
+  const [rouletteItems, setRouletteItems] = useState<string[]>([]);
   const [newItem, setNewItem] = useState('');
   const [result, setResult] = useState<string | null>(null);
+
+  const clearAll = () => {
+    setRouletteItems([]);
+  };
 
   const handleAddMenu = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,12 +44,34 @@ function App() {
           <h2>🎯 점심 메뉴 룰렛</h2>
           
           <div className="menu-tags">
+            {rouletteItems.length === 0 && (
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                아직 추가된 메뉴가 없습니다. AI 추천을 받거나 직접 입력해보세요!
+              </span>
+            )}
             {rouletteItems.map((item, index) => (
               <span key={index} className="menu-tag">
                 {item}
                 <button onClick={() => removeMenu(index)}>×</button>
               </span>
             ))}
+            {rouletteItems.length > 0 && (
+              <button 
+                onClick={clearAll} 
+                style={{ 
+                  background: 'rgba(239, 68, 68, 0.2)', 
+                  border: '1px solid #ef4444', 
+                  color: '#ef4444', 
+                  padding: '0.4rem 0.8rem', 
+                  borderRadius: '20px', 
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                  marginLeft: 'auto'
+                }}
+              >
+                모두 삭제 🗑️
+              </button>
+            )}
           </div>
 
           <form onSubmit={handleAddMenu} style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem' }}>
