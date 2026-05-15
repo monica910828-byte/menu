@@ -1,122 +1,95 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState } from 'react';
+import Chatbot from './components/Chatbot';
+import Roulette from './components/Roulette';
+import './index.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [rouletteItems, setRouletteItems] = useState<string[]>(['짜장면', '김치찌개', '돈까스', '제육볶음', '국밥']);
+  const [newItem, setNewItem] = useState('');
+  const [result, setResult] = useState<string | null>(null);
+
+  const handleAddMenu = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newItem.trim() && !rouletteItems.includes(newItem.trim())) {
+      setRouletteItems([...rouletteItems, newItem.trim()]);
+      setNewItem('');
+    }
+  };
+
+  const removeMenu = (index: number) => {
+    setRouletteItems(rouletteItems.filter((_, i) => i !== index));
+  };
+
+  const handleAIRecommend = (menuNames: string[]) => {
+    setRouletteItems(prev => {
+      const newItems = menuNames.filter(menu => !prev.includes(menu));
+      return [...prev, ...newItems];
+    });
+  };
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      <h1>오늘 점심 뭐 먹지? 🍱</h1>
+      <div className="app-container">
+        
+        {/* Left Panel: AI Chatbot */}
+        <Chatbot onRecommend={handleAIRecommend} />
 
-      <div className="ticks"></div>
+        {/* Right Panel: Roulette */}
+        <div className="glass-panel">
+          <h2>🎯 점심 메뉴 룰렛</h2>
+          
+          <div className="menu-tags">
+            {rouletteItems.map((item, index) => (
+              <span key={index} className="menu-tag">
+                {item}
+                <button onClick={() => removeMenu(index)}>×</button>
+              </span>
+            ))}
+          </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          <form onSubmit={handleAddMenu} style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem' }}>
+            <input 
+              type="text" 
+              value={newItem} 
+              onChange={(e) => setNewItem(e.target.value)} 
+              placeholder="메뉴 직접 추가..." 
+              style={{ flex: 1 }}
+            />
+            <button type="submit" className="btn-primary" style={{ width: 'auto', padding: '0.8rem 1.5rem' }}>추가</button>
+          </form>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+          <Roulette items={rouletteItems} onResult={(res) => setResult(res)} />
+        </div>
+
+      </div>
+
+      {/* Result Modal */}
+      {result && (
+        <div className="modal-overlay" onClick={() => setResult(null)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h3>🎉 오늘의 추천 메뉴는...</h3>
+            <div className="result-text">{result}</div>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+              <button className="btn-primary" onClick={() => setResult(null)} style={{ background: 'rgba(255,255,255,0.1)' }}>
+                다시 돌리기
+              </button>
+              <a 
+                href={`https://map.naver.com/v5/search/${result}`} 
+                target="_blank" 
+                rel="noreferrer"
+                style={{ textDecoration: 'none', flex: 1 }}
+              >
+                <button className="btn-primary">
+                  주변 식당 찾기 🗺️
+                </button>
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </>
-  )
+  );
 }
 
-export default App
+export default App;
