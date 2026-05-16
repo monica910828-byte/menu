@@ -1,5 +1,3 @@
-console.log(process.env.OPENAI_API_KEY);
-
 export const fetchChatResponse = async (messages: { role: string; content: string }[]) => {
   try {
     const response = await fetch('/api/chat', {
