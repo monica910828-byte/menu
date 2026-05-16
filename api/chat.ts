@@ -8,6 +8,7 @@ export default async function handler(req: any, res: any) {
   try {
     const messages = req.body.messages;
     const apiKey = process.env.OPENAI_API_KEY;
+    console.log(process.env.OPENAI_API_KEY);
 
     if (!apiKey) {
       return res.status(500).json({ error: 'OpenAI API key not configured' });
